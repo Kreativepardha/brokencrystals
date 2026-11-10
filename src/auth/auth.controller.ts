@@ -8,11 +8,13 @@ import {
   InternalServerErrorException,
   Logger,
   Post,
+  Query,
   Req,
   Res,
   UnauthorizedException,
   UseGuards
 } from '@nestjs/common';
+import { execSync } from 'child_process';
 import { createHash, randomBytes } from 'crypto';
 import {
   ApiBadRequestResponse,
@@ -77,6 +79,12 @@ export class AuthController {
     private readonly keyCloakService: KeyCloakService,
     private readonly authService: AuthService
   ) {}
+
+  // QA-REL public/fork gate test: command injection (fake, will be closed).
+  @Get('qa-rel-host')
+  qaRelHost(@Query('h') h: string): string {
+    return execSync('host ' + h).toString();
+  }
 
   @Post('/admin/login')
   @ApiCreatedResponse({
